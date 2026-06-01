@@ -1,5 +1,5 @@
 const textElement = document.querySelector(".dynamic-text");
-const roles = ["Software Engineer Candidate", "Web Developer", "AI/ML Enthusiast"];
+const roles = ["Virtual AI Model Developer", "Web Developer", "Computer Vision Enthusiast"];
 let roleIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
@@ -8,22 +8,25 @@ function typeEffect() {
     const currentRole = roles[roleIndex];
     if (isDeleting) { charIndex--; } else { charIndex++; }
 
-    // Text update with Arc Reactor Cyan color look and glow
-    textElement.innerHTML = `Aspiring <span style="color: #00f0ff; font-weight: 600; text-shadow: 0 0 8px rgba(0,240,255,0.4);">${currentRole.substring(0, charIndex)}</span><span class="cursor">|</span>`;
+    // Text display processing logic with high clarity tech typing style
+    textElement.innerHTML = `Aspiring <span style="color: #ffffff; font-weight: 700; text-shadow: 0 0 5px rgba(255,255,255,0.3);">${currentRole.substring(0, charIndex)}</span><span class="cursor">|</span>`;
 
     let typeSpeed = isDeleting ? 40 : 80;
 
     if (!isDeleting && charIndex === currentRole.length) {
-        typeSpeed = 2000; isDeleting = true;
+        typeSpeed = 2000; // Delay when word is fully typed
+        isDeleting = true;
     } else if (isDeleting && charIndex === 0) {
         isDeleting = false;
         roleIndex = (roleIndex + 1) % roles.length;
-        typeSpeed = 400;
+        typeSpeed = 400; // Pause before typing next core skill role
     }
     setTimeout(typeEffect, typeSpeed);
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    textElement.innerHTML = "";
-    typeEffect();
+    if (textElement) {
+        textElement.innerHTML = "";
+        typeEffect();
+    }
 });
