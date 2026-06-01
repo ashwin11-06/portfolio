@@ -107,7 +107,7 @@ footer {
     display: flex; 
     justify-content: center; 
     align-items: center; 
-    gap: 75px; 
+    gap: 75px; /* Clean breathing gap between icons */
     margin: 0 auto 40px auto;
 }
 
