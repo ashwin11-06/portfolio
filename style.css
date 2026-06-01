@@ -1,0 +1,98 @@
+:root {
+    --bg-main: #0c0f12;          /* Stark Stealth Deep Charcoal */
+    --bg-card: #141923;          /* HUD Tech Slate */
+    --text-primary: #ffffff;     /* High-Vis White */
+    --text-secondary: #8da2bb;   /* Tactical Tech Muted Blue */
+    --ffh-red: #ff2a2a;          /* Far From Home Tactical Red */
+    --edith-blue: #00e5ff;       /* EDITH Holographic Cyan */
+    --border-color: #1a2436;     /* Matrix Border grid */
+}
+
+* {
+    margin: 0; padding: 0;
+    box-sizing: border-box;
+    font-family: 'Rajdhani', sans-serif; /* Clean tech font */
+    scroll-behavior: smooth;
+    letter-spacing: 0.5px;
+}
+
+body {
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    padding-top: 80px;
+    background-image: linear-gradient(rgba(26, 36, 54, 0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(26, 36, 54, 0.15) 1px, transparent 1px);
+    background-size: 30px 30px; /* Tech Grid Background line animation feel */
+}
+
+/* EDITH Navbar */
+.navbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 15px 8%;
+    background: rgba(12, 15, 18, 0.9); backdrop-filter: blur(10px);
+    position: fixed; top: 0; width: 100%; z-index: 1000;
+    border-bottom: 2px solid var(--ffh-red);
+}
+.logo { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 900; color: var(--text-primary); }
+.logo span { color: var(--edith-blue); text-shadow: 0 0 10px var(--edith-blue); }
+.nav-links { list-style: none; display: flex; }
+.nav-links li { margin-left: 30px; }
+.nav-links a { text-decoration: none; color: var(--text-secondary); font-size: 15px; font-weight: 600; transition: 0.2s; }
+.nav-links a:hover { color: var(--edith-blue); text-shadow: 0 0 8px var(--edith-blue); }
+
+/* Hero HUD layout */
+.hero { min-height: 75vh; display: flex; align-items: center; padding: 0 8%; }
+.hero-content h5 { font-family: 'Orbitron', sans-serif; color: var(--edith-blue); font-size: 13px; font-weight: 700; letter-spacing: 2px; margin-bottom: 15px; }
+.hero-content h1 { font-family: 'Orbitron', sans-serif; font-size: 56px; font-weight: 900; color: var(--text-primary); margin-bottom: 15px; letter-spacing: -1px; text-shadow: 0 0 15px rgba(255,255,255,0.1); }
+.hero-content h3 { font-size: 24px; color: var(--text-secondary); margin-bottom: 25px; font-weight: 600; text-transform: uppercase; }
+.hero-content p { max-width: 650px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 35px; font-size: 17px; }
+.btn {
+    font-family: 'Orbitron', sans-serif;
+    display: inline-block; padding: 14px 28px;
+    background: transparent; border: 2px solid var(--ffh-red); color: var(--ffh-red);
+    text-decoration: none; font-size: 13px; font-weight: 700; letter-spacing: 1px; transition: 0.3s;
+    box-shadow: 0 0 15px rgba(255, 42, 42, 0.2);
+}
+.btn:hover { background: var(--ffh-red); color: #ffffff; box-shadow: 0 0 25px var(--ffh-red); }
+
+/* Structural Sections */
+section { padding: 90px 8% 60px 8%; border-bottom: 1px solid var(--border-color); }
+section h2 { font-family: 'Orbitron', sans-serif; font-size: 26px; font-weight: 700; margin-bottom: 35px; color: var(--text-primary); letter-spacing: 1px; }
+
+.about p { font-size: 18px; line-height: 1.7; color: var(--text-secondary); max-width: 800px; }
+
+/* Technical Skills Layout */
+.skills-container { display: flex; flex-wrap: wrap; gap: 12px; }
+.skill-card { background: var(--bg-card); padding: 14px 24px; border-radius: 4px; border: 1px solid var(--border-color); display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 600; text-transform: uppercase; transition: 0.2s; }
+.skill-card:hover { border-color: var(--edith-blue); box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); transform: translateY(-2px); }
+.skill-card i { color: var(--edith-blue); font-size: 18px; }
+
+/* Refined Single Project Card */
+.single-proj { background: var(--bg-card); padding: 35px; border-radius: 4px; border: 1px solid var(--border-color); max-width: 700px; transition: 0.3s; position: relative; overflow: hidden; }
+.single-proj::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--ffh-red); }
+.single-proj:hover { border-color: var(--edith-blue); box-shadow: 0 0 25px rgba(0, 229, 255, 0.15); }
+.proj-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+.proj-header h3 { font-family: 'Orbitron', sans-serif; font-size: 22px; font-weight: 700; color: var(--text-primary); }
+.status-tag { font-family: 'Orbitron', sans-serif; background: rgba(255, 42, 42, 0.1); border: 1px solid var(--ffh-red); color: var(--ffh-red); font-size: 11px; padding: 4px 10px; font-weight: 700; }
+.single-proj p { color: var(--text-secondary); font-size: 16px; line-height: 1.6; margin-bottom: 25px; }
+.tech-tags { display: flex; gap: 8px; }
+.tech-tag { background: #1a2230; color: var(--edith-blue); font-size: 13px; padding: 4px 12px; font-weight: 600; border: 1px solid rgba(0, 229, 255, 0.2); }
+
+/* Timeline Structure */
+.timeline { display: flex; flex-direction: column; gap: 25px; max-width: 800px; }
+.timeline-item { background: var(--bg-card); padding: 25px; border-radius: 4px; border-left: 3px solid var(--ffh-red); }
+.timeline-item.hackathon { border-left-color: var(--edith-blue); }
+.timeline-item h3 { font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 700; margin-bottom: 5px; }
+.timeline-item h4 { color: var(--edith-blue); font-size: 14px; font-weight: 600; margin-bottom: 12px; text-transform: uppercase; }
+.timeline-item p { font-size: 15px; color: var(--text-secondary); line-height: 1.5; }
+
+/* Clean Footer */
+footer { background: #080a0e; text-align: center; padding: 50px 0; border-top: 1px solid var(--border-color); }
+footer p { font-size: 15px; color: var(--text-secondary); font-weight: 600; }
+.socials { margin: 20px 0; }
+.socials a { color: var(--text-secondary); font-size: 22px; margin: 0 15px; transition: 0.2s; }
+.socials a:hover { color: var(--edith-blue); text-shadow: 0 0 10px var(--edith-blue); transform: scale(1.1); }
+.cr { font-size: 12px; color: #47596e; margin-top: 15px; }
+
+/* Blinking Cursor Effect */
+.cursor { animation: blink 0.7s infinite; color: var(--edith-blue); margin-left: 2px; font-weight: 900; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
