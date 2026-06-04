@@ -1,5 +1,5 @@
 const textElement = document.querySelector(".dynamic-text");
-const roles = ["Virtual AI Model Developer", "Web Developer", "Computer Vision Enthusiast"];
+const roles = ["Voxplay AI Developer", "Web Developer", "Computer Vision Enthusiast"];
 let roleIndex = 0;
 let charIndex = 0;
 let isDeleting = false;
