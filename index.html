@@ -1,116 +1,386 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B Ashwin | AI Portfolio</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- Far From Home Stealth Tech UI Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B. Ashwin | Neural Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<style>
+  :root {
+    /* HUD Palette */
+    --hud-bg: #01060e;
+    --hud-cyan: #00e5ff;
+    --hud-cyan-dim: rgba(0, 229, 255, 0.15);
+    --hud-alert: #ffaa00;
+    --hud-text: #e0fbfc;
+    --hud-muted: #5d8aa8;
+    
+    --font-sys: 'Share Tech Mono', monospace;
+    --font-ui: 'Rajdhani', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; background: var(--hud-bg); }
+  body {
+    color: var(--hud-text); font-family: var(--font-ui);
+    overflow-x: hidden; line-height: 1.6;
+    background: radial-gradient(circle at center, #010e1a 0%, #000205 100%);
+  }
+
+  /* ── HUD SCANLINES & GRID ── */
+  .scanlines {
+    display: none;
+  }
+  .hud-grid {
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: linear-gradient(var(--hud-cyan-dim) 1px, transparent 1px), linear-gradient(90deg, var(--hud-cyan-dim) 1px, transparent 1px);
+    background-size: 60px 60px; opacity: 0.3;
+  }
+
+  /* ── SCROLL REVEAL ANIMATIONS ── */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ── HUD TARGETING CORNERS ── */
+  .hud-box {
+    position: relative; padding: 2.5rem; background: rgba(0, 229, 255, 0.03);
+    border: 1px solid rgba(0, 229, 255, 0.1); backdrop-filter: blur(5px);
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s, opacity 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  .hud-box::before, .hud-box::after { content: ''; position: absolute; width: 15px; height: 15px; border-color: var(--hud-cyan); border-style: solid; }
+  .hud-box::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
+  .hud-box::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+  .hud-box:hover { border-color: rgba(0, 229, 255, 0.4); box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.05); }
+
+  /* ── NAVIGATION ── */
+  nav {
+    position: fixed; top: 0; left: 0; width: 100%; z-index: 100;
+    padding: 1.5rem 4%; display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(to bottom, rgba(1,6,14,0.9), transparent);
+  }
+  
+  .nav-links { display: flex; gap: 2rem; list-style: none; margin-left: auto; }
+  .nav-links a {
+    color: var(--hud-muted); text-decoration: none; font-family: var(--font-sys);
+    font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s;
+  }
+  .nav-links a:hover { color: var(--hud-cyan); text-shadow: 0 0 8px var(--hud-cyan); }
+
+  /* ── HERO SECTION & CORE ── */
+  #hero { min-height: 100vh; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; position: relative; z-index: 10; }
+  .hero-content { max-width: 600px; }
+  
+  h1 { font-family: var(--font-ui); font-size: clamp(3rem, 6vw, 5rem); font-weight: 700; color: var(--hud-text); line-height: 1; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 2px; }
+  h1 span { color: var(--hud-cyan); text-shadow: 0 0 15px rgba(0, 229, 255, 0.4); }
+
+  .typewriter-text { font-family: var(--font-sys); font-size: 1rem; color: var(--hud-muted); margin-bottom: 3rem; min-height: 2em; }
+  .cursor { display: inline-block; width: 8px; height: 1em; background: var(--hud-cyan); vertical-align: middle; animation: blink 1s infinite; }
+
+  /* ── ROTATING CORE ── */
+  .jarvis-core { position: relative; width: 400px; height: 400px; display: flex; justify-content: center; align-items: center; }
+  .core-ring { position: absolute; border-radius: 50%; border: 1px solid transparent; }
+  .ring-1 { width: 380px; height: 380px; border-top: 2px solid var(--hud-cyan); border-bottom: 2px solid var(--hud-cyan); animation: spin 8s linear infinite; opacity: 0.4; }
+  .ring-2 { width: 340px; height: 340px; border-left: 2px dashed var(--hud-cyan); border-right: 2px dashed var(--hud-cyan); animation: spin-reverse 12s linear infinite; opacity: 0.6; }
+  .ring-3 { width: 300px; height: 300px; border: 1px solid rgba(0, 229, 255, 0.2); animation: pulse-ring 4s ease-in-out infinite; }
+  .ring-4 { width: 280px; height: 280px; border-top: 3px solid var(--hud-cyan); border-right: 3px solid transparent; border-bottom: 3px solid var(--hud-cyan); border-left: 3px solid transparent; animation: spin 6s linear infinite; }
+  .core-center { width: 100px; height: 100px; background: radial-gradient(circle, var(--hud-cyan) 0%, transparent 70%); opacity: 0.8; animation: pulse-core 2s infinite alternate; }
+
+  @keyframes spin { 100% { transform: rotate(360deg); } }
+  @keyframes spin-reverse { 100% { transform: rotate(-360deg); } }
+  @keyframes pulse-ring { 0%, 100% { transform: scale(1); opacity: 0.2; } 50% { transform: scale(1.05); opacity: 0.5; } }
+  @keyframes pulse-core { 0% { transform: scale(0.9); opacity: 0.5; } 100% { transform: scale(1.1); opacity: 1; } }
+
+  .btn {
+    padding: 10px 25px; font-family: var(--font-sys); font-size: 0.8rem; font-weight: bold;
+    text-transform: uppercase; letter-spacing: 2px; text-decoration: none; border: 1px solid var(--hud-cyan);
+    color: var(--hud-cyan); background: rgba(0, 229, 255, 0.05); transition: 0.3s; position: relative; overflow: hidden;
+  }
+  .btn:hover { background: var(--hud-cyan); color: var(--hud-bg); box-shadow: 0 0 20px rgba(0, 229, 255, 0.5); }
+
+  /* ── SECTIONS ── */
+  section { padding: 6rem 5%; position: relative; z-index: 10; overflow: hidden; }
+  .sec-title { font-family: var(--font-sys); font-size: 1.5rem; color: var(--hud-cyan); margin-bottom: 3rem; display: flex; align-items: center; gap: 15px; text-transform: uppercase; }
+  .sec-title::before { content: ''; display: block; width: 40px; height: 2px; background: var(--hud-cyan); }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+
+  /* ── PROFILE & SKILLS ── */
+  .profile-text { font-size: 1.1rem; color: var(--hud-muted); margin-bottom: 1.5rem; }
+  .hud-stat { display: flex; justify-content: space-between; font-family: var(--font-sys); font-size: 0.85rem; color: var(--hud-text); margin-bottom: 5px; }
+  
+  a.hud-stat { transition: 0.3s; }
+  a.hud-stat:hover { border-color: var(--hud-cyan) !important; text-shadow: 0 0 8px var(--hud-cyan); }
+
+  .hud-bar { width: 100%; height: 4px; background: rgba(255,255,255,0.05); margin-bottom: 1.5rem; position: relative; }
+  .hud-fill { height: 100%; background: var(--hud-cyan); box-shadow: 0 0 10px var(--hud-cyan); transition: width 1.5s ease-in-out; width: 0; }
+
+  .tag-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 1rem; }
+  .hud-tag { padding: 5px 12px; font-family: var(--font-sys); font-size: 0.75rem; border: 1px solid var(--hud-cyan-dim); color: var(--hud-text); background: rgba(0, 229, 255, 0.02); }
+
+  /* ── PROJECTS ── */
+  .proj-head { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--hud-cyan-dim); padding-bottom: 10px; margin-bottom: 15px; }
+  .proj-name { font-size: 1.4rem; color: var(--hud-cyan); font-weight: 600; text-transform: uppercase; }
+  .proj-status { font-family: var(--font-sys); font-size: 0.7rem; color: var(--hud-alert); border: 1px solid var(--hud-alert); padding: 2px 8px; }
+  .proj-desc { color: var(--hud-muted); font-size: 1rem; margin-bottom: 1.5rem; }
+
+  /* ── TIMELINE ── */
+  .hud-timeline { border-left: 1px solid var(--hud-cyan); padding-left: 2rem; }
+  .hud-node { position: relative; margin-bottom: 2.5rem; }
+  .hud-node::before { content: ''; position: absolute; left: -2.35rem; top: 5px; width: 10px; height: 10px; background: var(--hud-bg); border: 2px solid var(--hud-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--hud-cyan); }
+  .node-title { font-size: 1.2rem; color: var(--hud-text); text-transform: uppercase; margin-bottom: 5px; }
+  .node-org { font-family: var(--font-sys); font-size: 0.85rem; color: var(--hud-cyan); margin-bottom: 10px; }
+  
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.5); } }
+
+  footer { text-align: center; padding: 2rem; border-top: 1px solid var(--hud-cyan-dim); font-family: var(--font-sys); font-size: 0.75rem; color: var(--hud-muted); }
+
+  @media (max-width: 900px) {
+    .grid-2, #hero { flex-direction: column; grid-template-columns: 1fr; }
+    .jarvis-core { display: none; }
+    .nav-links { display: none; }
+    h1 { font-size: 3rem; }
+  }
+</style>
 </head>
 <body>
 
-    <!-- Tech Navbar -->
-    <nav class="navbar">
-        <div class="logo">DEVELOPER<span>//PORTFOLIO</span></div>
-        <ul class="nav-links">
-            <li><a href="#about">ACCESS_ABOUT</a></li>
-            <li><a href="#skills">CORE_SKILLS</a></li>
-            <li><a href="#projects">PROJECT_DATA</a></li>
-            <li><a href="#experience">TIMELINE</a></li>
-        </ul>
-    </nav>
+<div class="hud-grid"></div>
+<div class="scanlines"></div>
 
-    <!-- Hero Section -->
-    <header class="hero" id="hero">
-        <div class="hero-content">
-            <h5>SYSTEM_STATUS // COMPLIANT</h5>
-            <h1>B. ASHWIN</h1>
-            <h3 class="dynamic-text">Aspiring Software Engineer <span class="divider">|</span> Web Developer</h3>
-            <p>An AI/ML student at Rathinam College skilled in web development and computer vision models. Motivated to apply technical frameworks through enterprise internships while leveraging creative expertise in music and sound engineering to build innovative solutions.</p>
-            <a href="#projects" class="btn">EXECUTE_PROJECTS.EXE</a>
+<nav>
+  <div></div> 
+  <ul class="nav-links">
+    <li><a href="#core">System_Data</a></li>
+    <li><a href="#modules">Protocols</a></li>
+    <li><a href="#projects">Archives</a></li>
+    <li><a href="#logs">Telemetry_Logs</a></li>
+    <li><a href="#contact">Comms_Link</a></li>
+  </ul>
+</nav>
+
+<section id="hero">
+  <div class="hero-content reveal">
+    <h1>B. <span>ASHWIN</span></h1>
+    <div class="typewriter-text">> <span id="type-text"></span><span class="cursor"></span></div>
+    <div style="display: flex; gap: 15px;">
+      <a href="#projects" class="btn">View Archives</a>
+      <a href="#contact" class="btn" style="background: transparent; color: var(--hud-muted); border-color: var(--hud-muted);">Initialize Comms</a>
+    </div>
+  </div>
+
+  <div class="jarvis-core reveal">
+    <div class="core-ring ring-1"></div>
+    <div class="core-ring ring-2"></div>
+    <div class="core-ring ring-3"></div>
+    <div class="core-ring ring-4"></div>
+    <div class="core-center"></div>
+  </div>
+</section>
+
+<section id="core">
+  <div class="sec-title reveal">Identity Parameters</div>
+  <div class="grid-2">
+    <div class="hud-box reveal">
+      <p class="profile-text">I am an operational AI/ML developer specializing in bridging backend cognitive logic with responsive front-end interfaces. Operating out of Coimbatore, I leverage creative problem-solving to architect solutions.</p>
+      <p class="profile-text">Beyond the terminal, I engineer sound. My background in music production informs my approach to software: technically flawless, yet deeply intuitive.</p>
+    </div>
+    <div class="hud-box reveal" style="display:flex; flex-direction:column; justify-content:center; align-items:center;">
+      <div style="font-family: var(--font-sys); font-size: 3rem; color: var(--hud-cyan); text-shadow: 0 0 20px var(--hud-cyan); margin-bottom: 10px;">99.9%</div>
+      <div style="font-family: var(--font-sys); font-size: 0.8rem; color: var(--hud-muted); letter-spacing: 2px;">SYNCHRONIZATION RATE</div>
+    </div>
+  </div>
+</section>
+
+<section id="modules">
+  <div class="sec-title reveal">System Modules</div>
+  <div class="grid-2">
+    <div class="hud-box reveal">
+      <div style="font-family: var(--font-sys); font-size: 0.85rem; color: var(--hud-cyan); margin-bottom: 1.5rem;">[ TECHNICAL_SPECS ]</div>
+      <div class="hud-stat"><span>Python / Automation Engine</span><span>88%</span></div>
+      <div class="hud-bar"><div class="hud-fill" data-width="88%"></div></div>
+      
+      <div class="hud-stat"><span>Prompt Engineering & Gen AI</span><span>95%</span></div>
+      <div class="hud-bar"><div class="hud-fill" data-width="95%"></div></div>
+      
+      <div class="hud-stat"><span>React / UI/UX Interface</span><span>85%</span></div>
+      <div class="hud-bar"><div class="hud-fill" data-width="85%"></div></div>
+    </div>
+    
+    <div class="hud-box reveal" style="transition-delay: 0.2s;">
+      <div style="font-family: var(--font-sys); font-size: 0.85rem; color: var(--hud-cyan); margin-bottom: 1.5rem;">[ OPERATIONAL_TRAITS ]</div>
+      <div class="tag-grid">
+        <div class="hud-tag">Cross-functional Leadership</div>
+        <div class="hud-tag">Effective Communication</div>
+        <div class="hud-tag">Creative Problem Solving</div>
+        <div class="hud-tag">Active Listening</div>
+        <div class="hud-tag">Adaptability</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="projects">
+  <div class="sec-title reveal">Deployed Assets</div>
+  <div class="grid-2">
+    <div class="hud-box reveal">
+      <div class="proj-head">
+        <div class="proj-name">VoxPlay System</div>
+        <div class="proj-status">CLASSIFIED</div>
+      </div>
+      <p class="proj-desc">An offline virtual AI assistant engineered with a custom HUD. Utilizes deep NLP for zero-latency speech recognition to control hardware, route applications, and manipulate media parameters autonomously.</p>
+      <div class="tag-grid">
+        <div class="hud-tag" style="border-color: var(--hud-cyan); color: var(--hud-cyan);">Python</div>
+        <div class="hud-tag" style="border-color: var(--hud-cyan); color: var(--hud-cyan);">Vosk NLP</div>
+        <div class="hud-tag" style="border-color: var(--hud-cyan); color: var(--hud-cyan);">Kivy UI</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="logs">
+  <div class="sec-title reveal">Telemetry Logs</div>
+  <div class="grid-2">
+    <div class="hud-box reveal">
+      <div style="font-family: var(--font-sys); font-size: 0.85rem; color: var(--hud-muted); margin-bottom: 2rem;">[ MISSION_LOGS ]</div>
+      <div class="hud-timeline">
+        <div class="hud-node">
+          <div class="node-title">Frontend Development Intern</div>
+          <div class="node-org">CYFOTOK INFOSEK</div>
+          <div class="profile-text" style="font-size: 0.9rem;">Engineered interactive UI components using React, optimizing render cycles to achieve a 25% reduction in page latency.</div>
         </div>
-    </header>
-
-    <!-- About Section -->
-    <section id="about" class="about">
-        <h2>// PROFILE_OVERVIEW</h2>
-        <p>An enthusiastic B.Sc. AI/ML student at Rathinam College skilled in frontend web development and computer vision models. Motivated to apply technical frameworks through hands-on software projects and enterprise internships. Uniquely bridges technical programming paradigms with creative expertise in music and sound engineering to build innovative solutions.</p>
-    </section>
-
-    <!-- Skills Section -->
-    <section id="skills" class="skills">
-        <h2>// TECH_CAPABILITIES</h2>
-        <div class="skills-container">
-            <div class="skill-card"><i class="fa-brands fa-python"></i> Python / C++</div>
-            <div class="skill-card"><i class="fa-solid fa-code"></i> HTML5 / CSS3 / JavaScript</div>
-            <div class="skill-card"><i class="fa-solid fa-layer-group"></i> Frontend Architecture</div>
-            <div class="skill-card"><i class="fa-solid fa-brain"></i> Machine Learning Foundations</div>
-            <div class="skill-card"><i class="fa-solid fa-terminal"></i> Git & Version Control</div>
+      </div>
+    </div>
+    <div class="hud-box reveal" style="transition-delay: 0.2s;">
+      <div style="font-family: var(--font-sys); font-size: 0.85rem; color: var(--hud-muted); margin-bottom: 2rem;">[ RECOGNITION_DB ]</div>
+      <div class="hud-timeline">
+        <div class="hud-node">
+          <div class="node-title">National Competitor</div>
+          <div class="node-org">Smart India Hackathon 2025</div>
         </div>
-    </section>
-
-    <!-- Projects Section (Voxplay Update) -->
-    <!-- Projects Section (VoxPlay Voice AI Update) -->
-    <section id="projects" class="projects">
-        <h2>// CLASSIFIED_PROJECT</h2>
-        <div class="project-grid">
-            <div class="project-card single-proj">
-                <div class="proj-header">
-                    <h3>VoxPlay AI Engine</h3>
-                    <span class="status-tag">VOICE_CORE_ACTIVE</span>
-                </div>
-                <p>An advanced offline voice-controlled AI assistant engineered with a custom Kivy Heads-Up Display (HUD). Utilizes Vosk NLP and PyAudio for zero-latency real-time speech recognition to execute seamless Windows hardware automation, application routing, and media control completely independent of internet connectivity.</p>
-                <div class="tech-tags">
-                    <span class="tech-tag">Python (Vosk NLP)</span> <span class="tech-tag">Kivy UI</span> <span class="tech-tag">PyAutoGUI & Pycaw</span>
-                </div>
-            </div>
+        <div class="hud-node">
+          <div class="node-title">Vocal Performance: Rank 1</div>
+          <div class="node-org">Rockstar 2024</div>
         </div>
-    </section>
-
-    <!-- Experience Section -->
-    <section id="experience" class="experience">
-        <h2>// OPERATIONAL_TIMELINE</h2>
-        <div class="timeline">
-            <div class="timeline-item">
-                <h3>Front-End Web Development Intern</h3>
-                <h4>Cyfotok Infosek | Coimbatore</h4>
-                <p>Engineered fluid frontend structures, focusing on responsive behaviors and cross-browser alignment.</p>
-            </div>
-            <div class="timeline-item">
-                <h3>Artificial Intelligence Intern</h3>
-                <h4>Cyfotok Infosek | Coimbatore</h4>
-                <p>Acquired enterprise insight into operational data mapping and standard machine learning workflow structures.</p>
-            </div>
-            <div class="timeline-item hackathon">
-                <h3>National Competitor</h3>
-                <h4>Smart India Hackathon 2025</h4>
-                <p>Collaborated within agile constraints to propose computational solutions targeting real-world operational complexities.</p>
-            </div>
+        <div class="hud-node">
+          <div class="node-title">The Best Singer Award</div>
+          <div class="node-org">Glitz India 2023</div>
         </div>
-    </section>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <!-- Secure Communications Footer -->
-    <footer>
-        <p class="footer-title">// SECURE_COMMUNICATION_LINK</p>
-        <div class="clean-icons-row">
-            <!-- Direct Gmail Tab Redirect -->
-            <a href="https://mail.google.com/mail/?view=cm&fs=1&to=ashwinbabu260@gmail.com" target="_blank" class="cyber-icon-btn" title="Gmail">
-                <i class="fa-brands fa-google"></i>
-            </a>
-            <!-- Real LinkedIn Redirect Asset Link -->
-            <a href="https://www.linkedin.com/in/b-ashwin1106/" target="_blank" class="cyber-icon-btn" title="LinkedIn">
-                <i class="fa-brands fa-linkedin"></i>
-            </a>
-            <!-- GitHub Data Center -->
-            <a href="https://github.com/your-username" target="_blank" class="cyber-icon-btn" title="GitHub">
-                <i class="fa-brands fa-github"></i>
-            </a>
-        </div>
-        <p class="cr">&copy; 2026 B Ashwin. All Protocols Verified.</p>
-    </footer>
+<section id="contact">
+  <div class="sec-title reveal">Comms Link</div>
+  <div class="grid-2">
+    <div class="hud-box reveal" style="display: flex; flex-direction: column; gap: 20px;">
+      <div style="font-family: var(--font-sys); font-size: 0.85rem; color: var(--hud-muted); margin-bottom: 5px;">[ ESTABLISH_CONNECTION ]</div>
+      
+      <a href="tel:+918610417512" class="hud-stat" style="text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
+        <span style="color: var(--hud-cyan);">> SECURE_LINE (PHONE)</span>
+        <span style="color: var(--hud-text);">+91 86104 17512</span>
+      </a>
+      
+      <a href="mailto:ashwinbabu260@gmail.com" class="hud-stat" style="text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
+        <span style="color: var(--hud-cyan);">> ENCRYPTED_MAIL</span>
+        <span style="color: var(--hud-text);">ashwinbabu260@gmail.com</span>
+      </a>
+      
+      <a href="https://linkedin.com/in/b-ashwin1106/" target="_blank" class="hud-stat" style="text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
+        <span style="color: var(--hud-cyan);">> LINKEDIN_NODE</span>
+        <span style="color: var(--hud-text);">/in/b-ashwin1106</span>
+      </a>
+      
+      <a href="https://github.com/ashwin11-06" target="_blank" class="hud-stat" style="text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 10px;">
+        <span style="color: var(--hud-cyan);">> GITHUB_REPO</span>
+        <span style="color: var(--hud-text);">/ashwin11-06</span>
+      </a>
+    </div>
+    
+    <div class="hud-box reveal" style="transition-delay: 0.2s; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+      <div style="font-family: var(--font-sys); font-size: 4rem; color: var(--hud-cyan); text-shadow: 0 0 20px var(--hud-cyan); margin-bottom: 10px;">📡</div>
+      <div style="font-family: var(--font-sys); font-size: 0.9rem; color: var(--hud-muted); letter-spacing: 3px; text-align: center;">
+        AWAITING <br> INCOMING TRANSMISSION
+      </div>
+    </div>
+  </div>
+</section>
 
+<footer>
+  > SYSTEM PROTOCOL V2.4.1 // ENGINEERED BY B. ASHWIN // COIMBATORE SERVER // EOF
+</footer>
+
+<script>
+// Typewriter Script
+const roles = ["Prompt Engineer", "UI/UX Developer", "AI & NLP Specialist", "System Architect"];
+let roleIdx = 0, charIdx = 0, isDeleting = false;
+const textEl = document.getElementById('type-text');
+
+function typeEffect() {
+  const current = roles[roleIdx];
+  if (!isDeleting) {
+    textEl.textContent = "CORE_DIRECTIVE: " + current.substring(0, charIdx++);
+    if (charIdx > current.length) {
+      isDeleting = true;
+      setTimeout(typeEffect, 2000);
+      return;
+    }
+  } else {
+    textEl.textContent = "CORE_DIRECTIVE: " + current.substring(0, charIdx--);
+    if (charIdx === 0) {
+      isDeleting = false;
+      roleIdx = (roleIdx + 1) % roles.length;
+    }
+  }
+  setTimeout(typeEffect, isDeleting ? 20 : 60);
+}
+setTimeout(typeEffect, 1000);
+
+// Scroll Reveal Script (Intersection Observer)
+document.addEventListener("DOMContentLoaded", function() {
+  const revealElements = document.querySelectorAll('.reveal');
+  
+  const revealOptions = {
+    threshold: 0.15,
+    rootMargin: "0px 0px -50px 0px"
+  };
+
+  const revealOnScroll = new IntersectionObserver(function(entries, observer) {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) {
+        return;
+      } else {
+        entry.target.classList.add('active');
+        
+        // Find skill bars inside revealed elements and animate them
+        const skillBars = entry.target.querySelectorAll('.hud-fill');
+        skillBars.forEach(bar => {
+          bar.style.width = bar.getAttribute('data-width');
+        });
+
+        observer.unobserve(entry.target); // Stop observing once revealed
+      }
+    });
+  }, revealOptions);
+
+  revealElements.forEach(el => {
+    revealOnScroll.observe(el);
+  });
+  
+  // Trigger active on hero elements immediately
+  setTimeout(() => {
+    document.querySelectorAll('#hero .reveal').forEach(el => el.classList.add('active'));
+  }, 300);
+});
+</script>
 </body>
 </html>
-
